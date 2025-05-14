@@ -1,0 +1,21 @@
+# Файлы конфигурации и секреты
+.env
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Docker
+docker/
+docker-compose.yml
+.dockerignore
+
+# Документация
+*.md
+
+# n8n_workflows монтируются как volume
+n8n_workflows/ 

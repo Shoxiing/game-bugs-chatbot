@@ -1,0 +1,16 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Установка зависимостей
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копирование кода приложения
+COPY src/ /app/src/
+
+# Экспозиция порта для Streamlit
+EXPOSE 8501
+
+# Запуск Streamlit приложения
+CMD ["streamlit", "run", "src/chatbot_app/ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"] 

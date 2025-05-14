@@ -1,0 +1,172 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "game-bugs-chatbot/query-log",
+        "options": {}
+      },
+      "id": "5d200024-5d1d-4044-afa8-a3ed5e881dd4",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        80
+      ],
+      "webhookId": "48583b9a-55fc-41bb-80ef-7f023590289e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.event_type }}",
+              "value2": "query"
+            }
+          ]
+        }
+      },
+      "id": "f6a18177-ffb1-4b01-a9e7-43005a2095b1",
+      "name": "IF (Query or Error)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Запросы"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Запрос",
+              "fieldValue": "={{ $json.body.query }}"
+            },
+            {
+              "fieldId": "Время",
+              "fieldValue": "={{ $json.body.timestamp }}"
+            },
+            {
+              "fieldId": "Количество результатов",
+              "fieldValue": "={{ $json.body.results_count }}"
+            },
+            {
+              "fieldId": "ID бага",
+              "fieldValue": "={{ $json.body.top_result_id }}"
+            },
+            {
+              "fieldId": "Уверенность",
+              "fieldValue": "={{ $json.body.top_result_score }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b40f7dd-9fb9-43a6-9288-61e31f5a6ff4",
+      "name": "Google Sheets - Запросы",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 243798649,
+          "mode": "list",
+          "cachedResultName": "Ошибки"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Время",
+              "fieldValue": "={{ $json.body.timestamp }}"
+            },
+            {
+              "fieldId": "Тип ошибки",
+              "fieldValue": "={{ $json.body.error_type }}"
+            },
+            {
+              "fieldId": "Сообщение",
+              "fieldValue": "={{ $json.body.error_message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8552c3d0-9656-49b6-89bc-6f823fd8af11",
+      "name": "Google Sheets - Ошибки",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        0,
+        180
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF (Query or Error)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF (Query or Error)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Запросы",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets - Ошибки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "instanceId": "78c01a29d614472be17eef46723fc3a4f46d1a491ce13fe73d6edca67bd4bcc8"
+  },
+  "tags": []
+}

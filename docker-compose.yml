@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  chatbot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+    environment:
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - PINECONE_NAMESPACE=${PINECONE_NAMESPACE}
+      - PINECONE_REGION=${PINECONE_REGION}
+      - PINECONE_CLOUD=${PINECONE_CLOUD}
+      - MODLE_VECTORIZER=${MODLE_VECTORIZER}
+    networks:
+      - app-network
+    depends_on:
+      - n8n
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.streamlit
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - CHATBOT_API_URL=${CHATBOT_API_URL}
+    networks:
+      - app-network
+    depends_on:
+      - chatbot
+
+  n8n:
+    image: n8nio/n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_PORT=5678
+      - N8N_HOST=localhost
+      - N8N_RUNNERS_ENABLED=true
+      - TZ=Europe/Moscow
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n_workflows:/home/node/.n8n/workflows
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  n8n_data:
+    driver: local 
